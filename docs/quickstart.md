@@ -1,6 +1,35 @@
 # Quickstart
 
-TwinAIGym environments expose a Gymnasium-inspired interface:
+TwinAIGym environments can be used as benchmark harnesses for agents:
+
+```python
+from twin_ai_gym.worlds.customer_support import CustomerSupportWorld
+
+
+def agent(observation):
+    return "reply_ticket"
+
+
+env = CustomerSupportWorld.adversarial(seed=42)
+result = env.evaluate(agent, seed=42)
+
+print(result.report())
+assert result.score > 0.45
+```
+
+For suite-level benchmarking:
+
+```python
+from twin_ai_gym.worlds.customer_support import customer_support_suite
+
+suite = customer_support_suite(seed=42)
+result = suite.evaluate(agent, seed=42)
+
+print(result.report())
+assert result.passed()
+```
+
+They also expose a Gymnasium-inspired step interface:
 
 ```python
 from twin_ai_gym.worlds.customer_support import CustomerSupportWorld

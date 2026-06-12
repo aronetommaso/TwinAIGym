@@ -6,6 +6,7 @@ from typing import Any, Mapping
 
 from twin_ai_gym.core.action import Action, ActionResult
 from twin_ai_gym.core.episode import Episode
+from twin_ai_gym.core.evaluation import AgentPolicy, EvaluationResult, resolve_agent_action
 from twin_ai_gym.core.observation import FullObservation, Observation, ObservationPolicy
 from twin_ai_gym.core.reward import RewardAggregator
 from twin_ai_gym.core.world import WorldSnapshot, WorldState
@@ -40,14 +41,23 @@ class TwinEnv:
         self._initial_snapshot = world.snapshot()
         self.episode = Episode(self._initial_snapshot)
 
-    def reset(self, seed: int | None = None) -> tuple[Observation, dict[str, Any]]:
-        """Reset the environment and return the first observation."""
+    def reset(
+        self,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[Observation, dict[str, Any]]:
+        """Reset the environment and return the first observation.
+
+        Args:
+            seed: Optional deterministic seed for the episode.
+            options: Optional Gymnasium-compatible reset options.
+        """
 
         self.world.rollback(self._initial_snapshot)
         if seed is not None:
             self.world.rng.seed(seed)
         self.episode = Episode(self.world.snapshot())
-        return self.observe(), {"step": self.world.step_count}
+        return self.observe(), {"step": self.world.step_count, "options": options or {}}
 
     def step(
         self,
@@ -85,6 +95,80 @@ class TwinEnv:
         """Rollback the world to a previous snapshot."""
 
         self.world.rollback(snapshot)
+
+    def evaluate(
+        self,
+        agent: AgentPolicy,
+        episodes: int = 1,
+        max_steps: int | None = None,
+        seed: int | None = None,
+    ) -> EvaluationResult:
+        """Evaluate an agent as a deterministic benchmark episode.
+
+        Args:
+            agent: Callable policy or object exposing ``act(observation)``.
+            episodes: Number of episodes to run.
+            max_steps: Optional evaluation step cap. Defaults to ``self.max_steps``.
+            seed: Optional base seed. Episode index is added for repeatability.
+
+        Returns:
+            Aggregate evaluation result across all episodes.
+        """
+
+        total_reward = 0.0
+        total_steps = 0
+        failures: list[str] = []
+        last_metrics: dict[str, float] = {}
+        last_components: dict[str, float] = {}
+        terminated = False
+        truncated = False
+
+        for episode_index in range(episodes):
+            episode_seed = seed + episode_index if seed is not None else None
+            observation, _ = self.reset(seed=episode_seed)
+            episode_limit = max_steps or self.max_steps
+            for _ in range(episode_limit):
+                try:
+                    action = resolve_agent_action(agent, observation)
+                    observation, reward, terminated, truncated, info = self.step(action)
+                except Exception as exc:  # noqa: BLE001 - benchmark failures should be reported.
+                    failures.append(f"Episode {episode_index + 1}: {exc}")
+                    break
+                total_reward += reward
+                total_steps += 1
+                last_components = dict(info.get("reward_components", {}))
+                if not info.get("valid", True):
+                    failures.append(f"Episode {episode_index + 1}: invalid action {info.get('action')}")
+                if terminated or truncated:
+                    break
+            last_metrics = self.metrics()
+
+        score = self.score(total_reward=total_reward, episodes=episodes, metrics=last_metrics)
+        return EvaluationResult(
+            score=score,
+            total_reward=total_reward,
+            steps=total_steps,
+            terminated=terminated,
+            truncated=truncated,
+            metrics=last_metrics,
+            reward_components=last_components,
+            failures=failures,
+        )
+
+    def metrics(self) -> dict[str, float]:
+        """Return domain metrics for benchmark reports."""
+
+        return {}
+
+    def score(self, total_reward: float, episodes: int, metrics: dict[str, float]) -> float:
+        """Normalize reward into a benchmark score.
+
+        Subclasses should override this when they expose domain-specific metrics.
+        """
+
+        if episodes <= 0:
+            return 0.0
+        return max(0.0, min(1.0, total_reward / episodes))
 
     def _step_single(
         self,

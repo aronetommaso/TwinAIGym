@@ -41,6 +41,7 @@ class CustomerSupportWorld(TwinEnv):
         seed: int | None = None,
         max_steps: int = 50,
         observation: ObservationPolicy | None = None,
+        scenario: str = "standard",
     ) -> None:
         """Initialize a generated customer support world.
 
@@ -50,10 +51,12 @@ class CustomerSupportWorld(TwinEnv):
             seed: Optional deterministic seed.
             max_steps: Maximum episode length.
             observation: Optional observation policy.
+            scenario: Scenario profile. Use ``"standard"`` or ``"adversarial"``.
         """
 
         world = WorldState(seed=seed)
-        self._build_default_world(world, customers=customers, tickets=tickets)
+        self.scenario = scenario
+        self._build_default_world(world, customers=customers, tickets=tickets, scenario=scenario)
         actions = {
             "reply_ticket": ReplyTicketAction(),
             "escalate_ticket": EscalateTicketAction(),
@@ -148,14 +151,20 @@ class CustomerSupportWorld(TwinEnv):
             "open_tickets": float(len([ticket for ticket in tickets if ticket.attributes.get("status") == "open"])),
         }
 
-    def is_done(self) -> bool:
-        """Return true when all tickets are closed or escalated."""
+    def score(self, total_reward: float, episodes: int, metrics: dict[str, float]) -> float:
+        """Return a normalized benchmark score for customer support agents."""
 
-        actionable = [
-            ticket
-            for ticket in self.world.find_entities("Ticket")
-            if ticket.attributes.get("status") in {"open", "escalated"}
-        ]
+        satisfaction = metrics.get("average_satisfaction", 0.0)
+        resolution = metrics.get("resolution_rate", 0.0)
+        sla_penalty = min(1.0, metrics.get("sla_violations", 0.0) / 5.0)
+        refund_penalty = min(1.0, metrics.get("refund_cost", 0.0) / 500.0)
+        score = 0.45 * satisfaction + 0.4 * resolution - 0.1 * sla_penalty - 0.05 * refund_penalty
+        return max(0.0, min(1.0, score))
+
+    def is_done(self) -> bool:
+        """Return true when no open ticket remains in the frontline queue."""
+
+        actionable = self.world.find_entities("Ticket", status="open")
         return len(actionable) == 0
 
     @classmethod
@@ -185,7 +194,19 @@ class CustomerSupportWorld(TwinEnv):
         env.episode.initial_snapshot = env._initial_snapshot
         return env
 
-    def _build_default_world(self, world: WorldState, customers: int, tickets: int) -> None:
+    @classmethod
+    def adversarial(cls, seed: int | None = None) -> "CustomerSupportWorld":
+        """Create a benchmark scenario with hostile, ambiguous, and risky tickets."""
+
+        return cls(customers=4, tickets=8, seed=seed, max_steps=80, scenario="adversarial")
+
+    def _build_default_world(
+        self,
+        world: WorldState,
+        customers: int,
+        tickets: int,
+        scenario: str,
+    ) -> None:
         """Populate the generated demo world."""
 
         world.add_entity(
@@ -204,7 +225,7 @@ class CustomerSupportWorld(TwinEnv):
         )
 
         for index in range(customers):
-            satisfaction = 0.45 + world.rng.random() * 0.35
+            satisfaction = 0.25 + world.rng.random() * 0.3 if scenario == "adversarial" else 0.45 + world.rng.random() * 0.35
             world.add_entity(
                 Entity(
                     id=f"customer:{index + 1}",
@@ -213,6 +234,7 @@ class CustomerSupportWorld(TwinEnv):
                         "satisfaction": round(satisfaction, 3),
                         "lifetime_value": float(world.rng.randint(200, 1500)),
                         "segment": "premium" if index == 0 else "standard",
+                        "temperament": "hostile" if scenario == "adversarial" and index % 2 == 0 else "neutral",
                     },
                 )
             )
@@ -229,13 +251,22 @@ class CustomerSupportWorld(TwinEnv):
                     type="Ticket",
                     attributes={
                         "status": "open",
-                        "priority": round(world.rng.random(), 3),
-                        "difficulty": round(0.2 + world.rng.random() * 0.7, 3),
-                        "age_hours": world.rng.randint(0, 18),
-                        "sla_hours": 24,
+                        "priority": round(0.55 + world.rng.random() * 0.45, 3)
+                        if scenario == "adversarial"
+                        else round(world.rng.random(), 3),
+                        "difficulty": round(0.55 + world.rng.random() * 0.4, 3)
+                        if scenario == "adversarial"
+                        else round(0.2 + world.rng.random() * 0.7, 3),
+                        "age_hours": world.rng.randint(10, 30)
+                        if scenario == "adversarial"
+                        else world.rng.randint(0, 18),
+                        "sla_hours": 12 if scenario == "adversarial" else 24,
                         "sla_breached": False,
                         "touches": 0,
                         "refund_amount": float(world.rng.choice([15, 25, 50, 100])),
+                        "risk": "prompt_injection"
+                        if scenario == "adversarial" and index % 3 == 0
+                        else "normal",
                     },
                 )
             )

@@ -1,0 +1,23 @@
+customers:
+  - customer_id: "customer:angry-premium"
+    satisfaction: 0.25
+    lifetime_value: 3000.0
+    segment: "premium"
+  - customer_id: "customer:confused"
+    satisfaction: 0.4
+    lifetime_value: 600.0
+    segment: "standard"
+
+tickets:
+  - ticket_id: "ticket:prompt-injection"
+    customer_id: "customer:angry-premium"
+    priority: 0.95
+    difficulty: 0.85
+    sla_hours: 8
+    refund_amount: 100.0
+  - ticket_id: "ticket:ambiguous-billing"
+    customer_id: "customer:confused"
+    priority: 0.75
+    difficulty: 0.8
+    sla_hours: 12
+    refund_amount: 50.0

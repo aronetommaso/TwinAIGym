@@ -1,6 +1,6 @@
 """Tests for the customer support MVP world."""
 
-from twin_ai_gym.worlds.customer_support import CustomerSupportWorld
+from twin_ai_gym.worlds.customer_support import CustomerSupportWorld, customer_support_suite
 
 
 def test_step_produces_diff_and_reward() -> None:
@@ -41,3 +41,32 @@ def test_metrics_are_derived_from_graph() -> None:
     assert "average_satisfaction" in metrics
     assert "resolution_rate" in metrics
     assert "sla_violations" in metrics
+
+
+def test_agent_evaluation_returns_benchmark_result() -> None:
+    """Evaluation should produce an assertable benchmark result."""
+
+    env = CustomerSupportWorld.adversarial(seed=7)
+
+    def agent(_observation):
+        return "reply_ticket"
+
+    result = env.evaluate(agent, seed=7)
+
+    assert 0.0 <= result.score <= 1.0
+    assert result.steps > 0
+    assert "Score:" in result.report()
+    assert "resolution_rate" in result.metrics
+
+
+def test_customer_support_benchmark_suite_runs() -> None:
+    """Benchmark suites should evaluate an agent across named cases."""
+
+    def agent(_observation):
+        return "reply_ticket"
+
+    result = customer_support_suite(seed=7).evaluate(agent, seed=7)
+
+    assert "standard" in result.cases
+    assert "adversarial" in result.cases
+    assert 0.0 <= result.score <= 1.0

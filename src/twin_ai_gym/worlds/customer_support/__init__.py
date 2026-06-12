@@ -7,6 +7,7 @@ from twin_ai_gym.worlds.customer_support.actions import (
     RefundCustomerAction,
     ReplyTicketAction,
 )
+from twin_ai_gym.worlds.customer_support.benchmarks import customer_support_suite
 from twin_ai_gym.worlds.customer_support.env import CustomerSupportWorld
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "IgnoreTicketAction",
     "RefundCustomerAction",
     "ReplyTicketAction",
+    "customer_support_suite",
 ]

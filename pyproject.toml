@@ -5,17 +5,20 @@ build-backend = "hatchling.build"
 [project]
 name = "twin-ai-gym"
 version = "0.1.0"
-description = "Graph-native digital twin environments for training and evaluating AI agents."
+description = "Open-source testing and benchmarking environments for AI agents."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-  { name = "TwinAIGym Authors" }
+  { name = "Tommaso Arone" }
 ]
 keywords = [
+  "ai-agents",
+  "agent-evaluation",
+  "agent-benchmark",
+  "agent-testing",
   "digital-twin",
   "knowledge-graph",
-  "reinforcement-learning",
   "llm-agents",
   "gym"
 ]
@@ -36,9 +39,9 @@ yaml = ["PyYAML>=6.0"]
 dev = ["pytest>=8.0", "ruff>=0.5"]
 
 [project.urls]
-Homepage = "https://github.com/example/twin-ai-gym"
-Repository = "https://github.com/example/twin-ai-gym"
-Issues = "https://github.com/example/twin-ai-gym/issues"
+Homepage = "https://github.com/aronetommaso/TwinAIGym"
+Repository = "https://github.com/aronetommaso/TwinAIGym"
+Issues = "https://github.com/aronetommaso/TwinAIGym/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/twin_ai_gym"]

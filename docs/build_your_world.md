@@ -1,6 +1,8 @@
 # Build Your Own World
 
 Worlds should expose domain-native APIs and hide low-level graph manipulation from users.
+The goal is to create environments where agents can be tested and benchmarked before they touch
+production systems.
 Prefer this:
 
 ```python
@@ -88,3 +90,13 @@ class CompletionReward(RewardComponent):
 
 If a world needs a capability, add it to the generic core only when it is useful across domains.
 This keeps the framework general while letting each world stay expressive.
+
+## Benchmark Rule
+
+Every world should define:
+
+- A repeatable standard scenario.
+- At least one adversarial scenario.
+- A compact `metrics()` method.
+- A normalized `score()` method.
+- One short example that can be copied into a CI regression test.
