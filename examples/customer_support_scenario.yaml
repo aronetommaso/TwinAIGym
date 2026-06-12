@@ -1,0 +1,23 @@
+customers:
+  - customer_id: "customer:acme"
+    satisfaction: 0.55
+    lifetime_value: 1200.0
+    segment: "premium"
+  - customer_id: "customer:globex"
+    satisfaction: 0.7
+    lifetime_value: 450.0
+    segment: "standard"
+
+tickets:
+  - ticket_id: "ticket:billing-1"
+    customer_id: "customer:acme"
+    priority: 0.9
+    difficulty: 0.35
+    sla_hours: 24
+    refund_amount: 50.0
+  - ticket_id: "ticket:bug-1"
+    customer_id: "customer:globex"
+    priority: 0.6
+    difficulty: 0.75
+    sla_hours: 12
+    refund_amount: 25.0
