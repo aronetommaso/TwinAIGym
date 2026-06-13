@@ -127,15 +127,21 @@ and easy to extend.
 - Interactive HTML graph/timeline renderer for debugging and replay inspection.
 - Example workflows for business-suite evaluation, Gymnasium-style policy search, and
   LLM prompt training/evaluation with replay export.
+- RL-ready vector observation encoders for customer support, generated business worlds,
+  and generic graph-state environments.
+- Gymnasium wrapper support for fixed-size numeric observations and discrete action
+  spaces, suitable for classical RL baselines.
+- Trajectory collection and JSONL export for RL, imitation learning, and fine-tuning
+  datasets.
+- RL training metrics and dependency-free HTML reports for score, reward, and held-out
+  evaluation.
+- CPU-only Q-learning project example for customer support optimization.
 
 ### Still Missing
 
-- Production-grade Gymnasium observation/action spaces for RLlib, Stable-Baselines3, and
-  other RL libraries.
-- Dataset export for trajectories, for example JSONL rows containing observation, action,
-  reward, next observation, terminal flags, metrics, and score.
-- Supervised policy training examples from collected trajectories, including CPU-friendly
-  baselines such as logistic regression, decision trees, and small neural policies.
+- Direct integration examples for Stable-Baselines3, RLlib, and CleanRL.
+- Supervised policy training examples from collected trajectories, including logistic
+  regression, decision trees, and small neural policies.
 - Fine-tuning dataset builders for LLM providers and local open-weight models.
 - Robust LLM action parsing with JSON schema validation, retry logic, invalid-action
   recovery, and cost/token tracking.

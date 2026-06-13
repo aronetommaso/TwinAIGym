@@ -11,6 +11,12 @@ from twin_ai_gym.core.relation import Relation
 from twin_ai_gym.core.reward import RewardAggregator, RewardComponent
 from twin_ai_gym.core.world import StateDiff, WorldSnapshot, WorldState
 from twin_ai_gym.marketplace import EnvironmentPackage, list_environment_packages
+from twin_ai_gym.rl.features import (
+    BusinessVectorEncoder,
+    CustomerSupportVectorEncoder,
+    GenericGraphVectorEncoder,
+    VectorObservation,
+)
 
 __all__ = [
     "Action",
@@ -20,11 +26,14 @@ __all__ = [
     "BenchmarkCase",
     "BenchmarkSuite",
     "BenchmarkSuiteResult",
+    "BusinessVectorEncoder",
+    "CustomerSupportVectorEncoder",
     "Entity",
     "Event",
     "EvaluationResult",
     "EnvironmentPackage",
     "FullObservation",
+    "GenericGraphVectorEncoder",
     "LocalSubgraphObservation",
     "Observation",
     "Relation",
@@ -32,6 +41,7 @@ __all__ = [
     "RewardComponent",
     "StateDiff",
     "TwinEnv",
+    "VectorObservation",
     "WorldSnapshot",
     "WorldState",
     "list_environment_packages",
