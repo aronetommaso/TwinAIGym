@@ -10,6 +10,7 @@ from twin_ai_gym.core.observation import FullObservation, LocalSubgraphObservati
 from twin_ai_gym.core.relation import Relation
 from twin_ai_gym.core.reward import RewardAggregator, RewardComponent
 from twin_ai_gym.core.world import StateDiff, WorldSnapshot, WorldState
+from twin_ai_gym.marketplace import EnvironmentPackage, list_environment_packages
 
 __all__ = [
     "Action",
@@ -22,6 +23,7 @@ __all__ = [
     "Entity",
     "Event",
     "EvaluationResult",
+    "EnvironmentPackage",
     "FullObservation",
     "LocalSubgraphObservation",
     "Observation",
@@ -32,4 +34,5 @@ __all__ = [
     "TwinEnv",
     "WorldSnapshot",
     "WorldState",
+    "list_environment_packages",
 ]

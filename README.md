@@ -110,12 +110,40 @@ and easy to extend.
 
 ## Roadmap
 
-- Formal Gymnasium adapter.
-- Pytest plugin for `assert agent.score(env) > threshold` workflows.
-- LangChain, LangGraph, CrewAI, AutoGen, and PydanticAI adapters.
-- Additional benchmark worlds: Sales, CRM, Startup Ops, Logistics, Procurement, HR.
-- Marketplace-style environment packages such as `twinaigym-sales` and `twinaigym-banking`.
-- Interactive graph/timeline renderer for screenshots and debugging.
+### Implemented
+
+- Graph-native `TwinEnv` with `step`, `reset`, `evaluate`, snapshots, diffs, rollback,
+  events, metrics, and replayable episodes.
+- Customer support benchmark world with standard and adversarial scenarios.
+- Benchmark suite API for evaluating one agent across multiple named cases.
+- Formal Gymnasium-compatible adapter through `twin_ai_gym.adapters.make_gymnasium_env`.
+- Pytest plugin and helper for threshold-based benchmark assertions.
+- Lightweight adapters for LangChain, LangGraph, CrewAI, AutoGen, and PydanticAI-style
+  agents.
+- Additional generated business benchmark worlds: Sales, CRM, Startup Ops, Logistics,
+  Procurement, and HR.
+- Marketplace-style package metadata via `list_environment_packages()`, including built-in
+  packages such as `twinaigym-sales` and external package slots such as `twinaigym-banking`.
+- Interactive HTML graph/timeline renderer for debugging and replay inspection.
+- Example workflows for business-suite evaluation, Gymnasium-style policy search, and
+  LLM prompt training/evaluation with replay export.
+
+### Still Missing
+
+- Production-grade Gymnasium observation/action spaces for RLlib, Stable-Baselines3, and
+  other RL libraries.
+- Dataset export for trajectories, for example JSONL rows containing observation, action,
+  reward, next observation, terminal flags, metrics, and score.
+- Supervised policy training examples from collected trajectories, including CPU-friendly
+  baselines such as logistic regression, decision trees, and small neural policies.
+- Fine-tuning dataset builders for LLM providers and local open-weight models.
+- Robust LLM action parsing with JSON schema validation, retry logic, invalid-action
+  recovery, and cost/token tracking.
+- More domain-specific business worlds with richer rules instead of only generated generic
+  process dynamics.
+- Versioned benchmark cards, scorecards, and leaderboard-ready result exports.
+- Stronger CI coverage, package publishing workflow, and documentation for third-party
+  environment packages.
 
 ## Design Principles
 

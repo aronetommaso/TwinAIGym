@@ -35,8 +35,13 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+gymnasium = ["gymnasium>=0.29"]
+llm = ["openai>=1.0"]
 yaml = ["PyYAML>=6.0"]
 dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.entry-points.pytest11]
+twinaigym = "twin_ai_gym.pytest_plugin"
 
 [project.urls]
 Homepage = "https://github.com/aronetommaso/TwinAIGym"
