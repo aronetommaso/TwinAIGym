@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from twin_ai_gym.core.action import ActionResult
 from twin_ai_gym.core.world import WorldSnapshot, WorldState
@@ -13,6 +13,7 @@ class RewardComponent:
 
     name = "reward"
     weight = 1.0
+    description = ""
 
     def compute(
         self,
@@ -31,6 +32,18 @@ class RewardBreakdown:
 
     total: float
     components: dict[str, float]
+    attribution: dict[str, RewardAttribution] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class RewardAttribution:
+    """Auditable contribution of one business objective to scalar reward."""
+
+    component: str
+    raw_value: float
+    weight: float
+    contribution: float
+    description: str = ""
 
 
 class RewardAggregator:
@@ -55,15 +68,24 @@ class RewardAggregator:
         """Compute total reward and component-level contributions."""
 
         values: dict[str, float] = {}
+        attribution: dict[str, RewardAttribution] = {}
         total = 0.0
         if not action_result.valid:
             values["invalid_action"] = -1.0
             total -= 1.0
         for component in self.components:
-            value = component.compute(before, after, action_result) * component.weight
+            raw_value = component.compute(before, after, action_result)
+            value = raw_value * component.weight
             values[component.name] = value
+            attribution[component.name] = RewardAttribution(
+                component=component.name,
+                raw_value=raw_value,
+                weight=component.weight,
+                contribution=value,
+                description=component.description or (component.__doc__ or "").strip().splitlines()[0],
+            )
             total += value
         total -= action_result.cost
         if action_result.cost:
             values["action_cost"] = -action_result.cost
-        return RewardBreakdown(total=total, components=values)
+        return RewardBreakdown(total=total, components=values, attribution=attribution)

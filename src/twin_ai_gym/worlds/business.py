@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Mapping
 
 from twin_ai_gym.core.action import Action
 from twin_ai_gym.core.benchmark import BenchmarkCase, BenchmarkSuite
@@ -61,14 +61,14 @@ class BusinessAction(Action):
         self.mode = mode
         self.cost = cost
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an actionable work item exists."""
 
         if _current_item(state) is None:
             return "No open work item is available."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply a generic business transition."""
 
         item = _current_item(state)

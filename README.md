@@ -1,15 +1,21 @@
 # TwinAIGym
 
-**TwinAIGym is an open-source testing and benchmarking platform for AI agents.**
+**TwinAIGym is a graph-native evaluation framework for autonomous agents.**
 
 It helps you test agents before production by running them inside mutable business
 simulations: customer support queues, CRM workflows, sales pipelines, logistics operations,
 procurement flows, HR processes, and other enterprise scenarios where actions have delayed
 consequences.
 
-The technical foundation is a graph-native digital twin. Each environment stores state as a
-dynamic Knowledge Graph, applies domain actions, computes rewards from graph transitions, and
-records snapshots, diffs, rollback data, events, metrics, and replayable episodes.
+Its scientific thesis is:
+
+> Representing enterprise environments as evolving knowledge graphs enables auditable state
+> transitions, explainable reward attribution, and reproducible evaluation of agents under
+> relational and delayed consequences.
+
+The graph is not merely storage. Each environment defines typed actions, an explicit transition
+model, causal propagation rules, an observation model, compositional reward components, and
+replayable graph trajectories.
 
 ```python
 from twin_ai_gym.worlds.customer_support import CustomerSupportWorld
@@ -47,9 +53,30 @@ TwinAIGym is designed for that missing layer:
 - Graph-native state, so business dependencies are explicit and inspectable.
 - Diff, snapshot, rollback, and replay for debugging agent behavior.
 
-## Current MVP
+## Formal Model
 
-The first included benchmark world is `CustomerSupportWorld`.
+TwinAIGym environments implement a graph-valued MDP or POMDP:
+
+```text
+G(t+1) ~ P(G(t+1) | G(t), A(t))
+O(t)   ~ Omega(O(t) | G(t))
+R(t)    = sum_k weight(k) * reward_component(k)
+```
+
+- `WorldState` is the latent evolving graph.
+- `ActionCommand` is a typed high-level action with validated parameters.
+- `Action` is the graph operator that realizes the command.
+- `TransitionModel` and named `PropagationRule` objects define the dynamics.
+- `FullObservation`, `LocalSubgraphObservation`, and `NoisyObservation` distinguish MDP and
+  POMDP evaluation.
+- `StateDiff` makes every transition inspectable.
+- `RewardAttribution` retains raw values, weights, and contributions behind the scalar reward.
+
+See [the scientific formulation](docs/scientific_formulation.md).
+
+## Included Worlds
+
+`CustomerSupportWorld` models:
 
 It models:
 
@@ -57,6 +84,31 @@ It models:
 - Actions such as reply, escalate, refund, ask for more information, and ignore.
 - Rewards for satisfaction, resolution rate, SLA behavior, and refund cost.
 - Standard and adversarial scenarios.
+
+`MaintenanceWorld` is the causal graph benchmark. Services depend on components, components are
+owned by teams, incidents propagate through `DEPENDS_ON` and `OWNED_BY`, and symptom-level actions
+fail until the root cause is repaired.
+
+Generated benchmark worlds also cover Sales, CRM, Startup Operations, Logistics, Procurement,
+and HR.
+
+### Structured action example
+
+```python
+from twin_ai_gym import ActionCommand
+from twin_ai_gym.worlds import MaintenanceWorld
+
+env = MaintenanceWorld(seed=42)
+observation, _ = env.reset()
+
+observation, reward, terminated, truncated, info = env.step(
+    ActionCommand("repair_component", {"component_id": "component:db"})
+)
+
+print(info["metadata"]["causal_rules"])
+print(info["reward_attribution"])
+print(info["diff"].summary())
+```
 
 Run the example:
 
@@ -115,6 +167,12 @@ and easy to extend.
 - Graph-native `TwinEnv` with `step`, `reset`, `evaluate`, snapshots, diffs, rollback,
   events, metrics, and replayable episodes.
 - Customer support benchmark world with standard and adversarial scenarios.
+- Explicit `TransitionModel` dynamics and named causal graph propagation rules.
+- Typed `ActionCommand`/`ActionSpec` action spaces with parameter validation.
+- MDP, local-subgraph, and seeded noisy POMDP observation policies.
+- Component-level reward attribution with raw values and weights.
+- Causal maintenance benchmark with graph-aware, myopic, and random baselines.
+- Multi-seed comparison with standard deviation, confidence intervals, and termination rate.
 - Benchmark suite API for evaluating one agent across multiple named cases.
 - Formal Gymnasium-compatible adapter through `twin_ai_gym.adapters.make_gymnasium_env`.
 - Pytest plugin and helper for threshold-based benchmark assertions.
@@ -147,7 +205,7 @@ and easy to extend.
   recovery, and cost/token tracking.
 - More domain-specific business worlds with richer rules instead of only generated generic
   process dynamics.
-- Versioned benchmark cards, scorecards, and leaderboard-ready result exports.
+- Hosted leaderboard and externally submitted benchmark cards.
 - Stronger CI coverage, package publishing workflow, and documentation for third-party
   environment packages.
 
@@ -156,5 +214,54 @@ and easy to extend.
 Worlds should expose domain-native APIs such as `add_customer()` or `add_ticket()` instead of
 forcing users to manage low-level graph nodes and edges.
 
-The Knowledge Graph is the state. The transition rules are the simulator. The benchmark is the
-contract that tells you whether an agent is ready to ship.
+The Knowledge Graph is the evolving state. Typed commands select graph operators. The transition
+model propagates consequences. Graph diffs explain what changed. Reward attribution explains why
+it mattered. The benchmark is the reproducible contract.
+
+## Benchmark
+
+Run the paper-style causal benchmark:
+
+```powershell
+$env:PYTHONPATH = ".\src"
+python examples\scientific_benchmark.py
+```
+
+Thirty paired seeds produce:
+
+| Agent | Mean score | Std | 95% CI | Termination | Mean steps |
+|---|---:|---:|---:|---:|---:|
+| Graph-aware | 0.956 | 0.008 | +/- 0.003 | 100.0% | 2.60 |
+| Random | 0.726 | 0.238 | +/- 0.085 | 43.3% | 7.20 |
+| Myopic service restart | 0.068 | 0.045 | +/- 0.016 | 0.0% | 8.00 |
+
+The graph-aware policy repairs the failed dependency before restarting the affected service. The
+myopic policy repeatedly restarts the visible service, after which the causal transition model
+immediately propagates the unresolved database outage back through `DEPENDS_ON`.
+
+Machine-readable results are in
+[`benchmarks/maintenance_results.json`](benchmarks/maintenance_results.json); the generated table
+is in [`benchmarks/maintenance_results.md`](benchmarks/maintenance_results.md).
+
+## Controlled Representation Study
+
+TwinAIGym also ships a paired experiment over 120 latent tasks, four state/dynamics conditions,
+three observation regimes, and three local policy baselines:
+
+```powershell
+$env:PYTHONPATH = ".\src"
+python examples\representation_benchmark.py
+```
+
+The current offline run contains 12,960 evaluated episodes plus a 10–100 node scaling study. Its
+most important result is deliberately conservative: graph, tabular, and object representations
+produce identical outcomes for a symbolic heuristic when they expose equivalent facts. Causal
+propagation, however, substantially changes policy success and reveals failures hidden by static
+dynamics.
+
+Three OpenAI-compatible LLM/tool-agent conditions are implemented with token and cost tracking.
+They are reported as skipped when no API key is configured; missing model results are never
+imputed.
+
+See [the experimental protocol](docs/representation_study.md) and the generated
+[study report](benchmarks/representation_study/REPORT.md).

@@ -50,6 +50,12 @@ class ObservationPolicy:
 
         raise NotImplementedError
 
+    @property
+    def observability(self) -> str:
+        """Return ``mdp`` or ``pomdp`` for benchmark metadata."""
+
+        return "pomdp"
+
 
 class FullObservation(ObservationPolicy):
     """Observation policy that exposes the full graph state."""
@@ -62,6 +68,12 @@ class FullObservation(ObservationPolicy):
             relations=dict(state.relations),
             events=[{"type": event.type, "payload": event.payload, "step": event.step} for event in state.events],
         )
+
+    @property
+    def observability(self) -> str:
+        """Full state visibility defines an MDP observation."""
+
+        return "mdp"
 
 
 class LocalSubgraphObservation(ObservationPolicy):
@@ -110,4 +122,52 @@ class LocalSubgraphObservation(ObservationPolicy):
         return Observation(
             entities={entity_id: state.entities[entity_id].copy() for entity_id in seen},
             relations={relation_id: state.relations[relation_id] for relation_id in relation_ids},
+        )
+
+
+class NoisyObservation(ObservationPolicy):
+    """POMDP policy that hides entities and perturbs numeric attributes reproducibly."""
+
+    def __init__(
+        self,
+        base: ObservationPolicy | None = None,
+        entity_dropout: float = 0.1,
+        numeric_noise: float = 0.05,
+    ) -> None:
+        """Configure graph masking and bounded additive noise."""
+
+        if not 0.0 <= entity_dropout <= 1.0:
+            raise ValueError("entity_dropout must be between 0 and 1.")
+        if numeric_noise < 0.0:
+            raise ValueError("numeric_noise must be non-negative.")
+        self.base = base or FullObservation()
+        self.entity_dropout = entity_dropout
+        self.numeric_noise = numeric_noise
+
+    def observe(self, state: WorldState, agent_id: str | None = None) -> Observation:
+        """Return a seeded partial and noisy graph observation."""
+
+        visible = self.base.observe(state, agent_id=agent_id)
+        entities: dict[str, Entity] = {}
+        for entity_id, entity in visible.entities.items():
+            if entity_id != agent_id and state.observation_rng.random() < self.entity_dropout:
+                continue
+            copied = entity.copy()
+            for key, value in copied.attributes.items():
+                if isinstance(value, float) and not isinstance(value, bool):
+                    copied.attributes[key] = value + state.observation_rng.uniform(
+                        -self.numeric_noise,
+                        self.numeric_noise,
+                    )
+            entities[entity_id] = copied
+        relations = {
+            relation_id: relation
+            for relation_id, relation in visible.relations.items()
+            if relation.source in entities and relation.target in entities
+        }
+        return Observation(
+            entities=entities,
+            relations=relations,
+            metrics=dict(visible.metrics),
+            events=list(visible.events),
         )

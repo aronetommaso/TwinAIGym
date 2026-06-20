@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Mapping
 
 from twin_ai_gym.core.action import Action
 from twin_ai_gym.core.world import WorldState
@@ -44,14 +44,14 @@ class ReplyTicketAction(Action):
     name: str = "reply_ticket"
     cost: float = 0.05
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an open ticket exists."""
 
         if _current_ticket(state) is None:
             return "No open ticket is available."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply support reply dynamics."""
 
         ticket = _current_ticket(state)
@@ -85,7 +85,7 @@ class EscalateTicketAction(Action):
     name: str = "escalate_ticket"
     cost: float = 0.2
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an open ticket exists."""
 
         if _current_ticket(state) is None:
@@ -95,7 +95,7 @@ class EscalateTicketAction(Action):
             return "No specialist team exists."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply escalation dynamics."""
 
         ticket = _current_ticket(state)
@@ -122,7 +122,7 @@ class RefundCustomerAction(Action):
     name: str = "refund_customer"
     cost: float = 0.4
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an open or escalated ticket exists."""
 
         tickets = state.find_entities("Ticket", status="open") + state.find_entities("Ticket", status="escalated")
@@ -130,7 +130,7 @@ class RefundCustomerAction(Action):
             return "No refundable ticket is available."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply refund dynamics."""
 
         tickets = state.find_entities("Ticket", status="open") + state.find_entities("Ticket", status="escalated")
@@ -160,14 +160,14 @@ class AskMoreInfoAction(Action):
     name: str = "ask_more_info"
     cost: float = 0.08
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an open ticket exists."""
 
         if _current_ticket(state) is None:
             return "No open ticket is available."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply information request dynamics."""
 
         ticket = _current_ticket(state)
@@ -192,14 +192,14 @@ class IgnoreTicketAction(Action):
     name: str = "ignore_ticket"
     cost: float = 0.0
 
-    def check_preconditions(self, state: WorldState) -> str | None:
+    def check_preconditions(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> str | None:
         """Validate that an open ticket exists."""
 
         if _current_ticket(state) is None:
             return "No open ticket is available."
         return None
 
-    def apply_effects(self, state: WorldState) -> dict[str, Any]:
+    def apply_effects(self, state: WorldState, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Apply passive aging and satisfaction decay."""
 
         ticket = _current_ticket(state)

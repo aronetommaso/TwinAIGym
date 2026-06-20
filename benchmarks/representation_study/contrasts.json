@@ -1,0 +1,272 @@
+[
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "full",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "full",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "full",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "noisy",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "noisy",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "noisy",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "partial",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "partial",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "tabular",
+    "observability": "partial",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "full",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "full",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "full",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "noisy",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0007499999999999985,
+    "reward_ci95": 0.0017974936899637821
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "noisy",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.04722222222222222,
+    "reward_delta": 0.06758597222222226,
+    "reward_ci95": 0.11788030726502675
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "noisy",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": -0.002777777777777778,
+    "reward_delta": 0.042253333333333365,
+    "reward_ci95": 0.1328831686064499
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "partial",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "partial",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "object",
+    "observability": "partial",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": 0.0,
+    "reward_ci95": 0.0
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "full",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": -0.04728875000000013,
+    "reward_ci95": 0.0055360850154528695
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "full",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": -0.3,
+    "reward_delta": -1.64189625,
+    "reward_ci95": 0.19409803888441884
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "full",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": -0.08055555555555556,
+    "reward_delta": -1.4524922222222223,
+    "reward_ci95": 0.10190964057120278
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "noisy",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": -0.048122083333333454,
+    "reward_ci95": 0.005385184491059489
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "noisy",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": -0.1,
+    "reward_delta": -0.28433194444444443,
+    "reward_ci95": 0.10239306411020667
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "noisy",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": -0.04722222222222222,
+    "reward_delta": -1.40985375,
+    "reward_ci95": 0.10214729066041223
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "partial",
+    "agent": "heuristic",
+    "pairs": 360,
+    "success_delta": 0.0,
+    "reward_delta": -0.042288750000000305,
+    "reward_ci95": 0.0036486641086061174
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "partial",
+    "agent": "q_learning",
+    "pairs": 360,
+    "success_delta": -0.09166666666666666,
+    "reward_delta": -1.0568216666666663,
+    "reward_ci95": 0.19929070600121862
+  },
+  {
+    "reference": "graph_causal",
+    "comparison": "graph_no_propagation",
+    "observability": "partial",
+    "agent": "random",
+    "pairs": 360,
+    "success_delta": -0.06666666666666667,
+    "reward_delta": -1.341079861111111,
+    "reward_ci95": 0.10141340787731758
+  }
+]

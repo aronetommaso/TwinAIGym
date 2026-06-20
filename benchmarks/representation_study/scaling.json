@@ -1,0 +1,130 @@
+[
+  {
+    "representation": "graph_causal",
+    "nodes": 10,
+    "relations": 11,
+    "observation_ms": 0.027722492814064026,
+    "transition_ms": 0.019680007244460285,
+    "payload_bytes": 3138
+  },
+  {
+    "representation": "graph_no_propagation",
+    "nodes": 10,
+    "relations": 11,
+    "observation_ms": 0.028000009479001164,
+    "transition_ms": 0.0161500065587461,
+    "payload_bytes": 3146
+  },
+  {
+    "representation": "tabular",
+    "nodes": 10,
+    "relations": 11,
+    "observation_ms": 0.02774499007500708,
+    "transition_ms": 0.01836250303313136,
+    "payload_bytes": 3063
+  },
+  {
+    "representation": "object",
+    "nodes": 10,
+    "relations": 11,
+    "observation_ms": 0.03926500212401152,
+    "transition_ms": 0.018009997438639402,
+    "payload_bytes": 4241
+  },
+  {
+    "representation": "graph_causal",
+    "nodes": 25,
+    "relations": 38,
+    "observation_ms": 0.08303251233883202,
+    "transition_ms": 0.06007501215208322,
+    "payload_bytes": 8467
+  },
+  {
+    "representation": "graph_no_propagation",
+    "nodes": 25,
+    "relations": 38,
+    "observation_ms": 0.13581000093836337,
+    "transition_ms": 0.050682510482147336,
+    "payload_bytes": 8475
+  },
+  {
+    "representation": "tabular",
+    "nodes": 25,
+    "relations": 38,
+    "observation_ms": 0.07910000567790121,
+    "transition_ms": 0.05541500577237457,
+    "payload_bytes": 8058
+  },
+  {
+    "representation": "object",
+    "nodes": 25,
+    "relations": 38,
+    "observation_ms": 0.14306249504443258,
+    "transition_ms": 0.04290499782655388,
+    "payload_bytes": 12432
+  },
+  {
+    "representation": "graph_causal",
+    "nodes": 50,
+    "relations": 78,
+    "observation_ms": 0.19965000974480063,
+    "transition_ms": 0.11779000342357904,
+    "payload_bytes": 17142
+  },
+  {
+    "representation": "graph_no_propagation",
+    "nodes": 50,
+    "relations": 78,
+    "observation_ms": 0.19327251648064703,
+    "transition_ms": 0.0974149937974289,
+    "payload_bytes": 17150
+  },
+  {
+    "representation": "tabular",
+    "nodes": 50,
+    "relations": 78,
+    "observation_ms": 0.22907499806024134,
+    "transition_ms": 0.1407649921020493,
+    "payload_bytes": 16236
+  },
+  {
+    "representation": "object",
+    "nodes": 50,
+    "relations": 78,
+    "observation_ms": 0.41764251072891057,
+    "transition_ms": 0.10978000063914806,
+    "payload_bytes": 25082
+  },
+  {
+    "representation": "graph_causal",
+    "nodes": 100,
+    "relations": 157,
+    "observation_ms": 0.6322024972178042,
+    "transition_ms": 0.3315849928185344,
+    "payload_bytes": 34249
+  },
+  {
+    "representation": "graph_no_propagation",
+    "nodes": 100,
+    "relations": 157,
+    "observation_ms": 0.5682999966666102,
+    "transition_ms": 0.2964124985737726,
+    "payload_bytes": 34257
+  },
+  {
+    "representation": "tabular",
+    "nodes": 100,
+    "relations": 157,
+    "observation_ms": 0.5739349988289177,
+    "transition_ms": 0.3163650049827993,
+    "payload_bytes": 32365
+  },
+  {
+    "representation": "object",
+    "nodes": 100,
+    "relations": 157,
+    "observation_ms": 1.3709925027796999,
+    "transition_ms": 0.3491925133857876,
+    "payload_bytes": 50509
+  }
+]

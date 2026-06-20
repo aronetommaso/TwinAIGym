@@ -5,17 +5,18 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol
 
+from twin_ai_gym.core.action import ActionCommand
 from twin_ai_gym.core.observation import Observation
 
 
 class AgentLike(Protocol):
     """Protocol for agents that can act inside a TwinAIGym environment."""
 
-    def act(self, observation: Observation) -> str:
+    def act(self, observation: Observation) -> str | ActionCommand:
         """Return the next action name for an observation."""
 
 
-AgentPolicy = AgentLike | Callable[[Observation], str]
+AgentPolicy = AgentLike | Callable[[Observation], str | ActionCommand]
 
 
 @dataclass(slots=True)
@@ -64,7 +65,7 @@ class EvaluationResult:
         return "\n".join(lines)
 
 
-def resolve_agent_action(agent: AgentPolicy, observation: Observation) -> str:
+def resolve_agent_action(agent: AgentPolicy, observation: Observation) -> str | ActionCommand:
     """Resolve the next action from a callable or object-style agent."""
 
     if callable(agent) and not hasattr(agent, "act"):

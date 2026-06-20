@@ -29,6 +29,7 @@ class WorldSnapshot:
     events: list[Event]
     step_count: int
     rng_state: object
+    observation_rng_state: object
 
 
 @dataclass(slots=True)
@@ -91,6 +92,7 @@ class WorldState:
         self.events: list[Event] = []
         self.step_count = 0
         self.rng = random.Random(seed)
+        self.observation_rng = random.Random(None if seed is None else seed + 1_000_003)
 
     def add_entity(self, entity: Entity) -> None:
         """Add an entity to the world.
@@ -193,6 +195,7 @@ class WorldState:
             events=list(self.events),
             step_count=self.step_count,
             rng_state=self.rng.getstate(),
+            observation_rng_state=self.observation_rng.getstate(),
         )
 
     def rollback(self, snapshot: WorldSnapshot) -> None:
@@ -203,6 +206,7 @@ class WorldState:
         self.events = list(snapshot.events)
         self.step_count = snapshot.step_count
         self.rng.setstate(snapshot.rng_state)
+        self.observation_rng.setstate(snapshot.observation_rng_state)
 
     def diff(self, before: WorldSnapshot, after: WorldSnapshot | None = None) -> StateDiff:
         """Compute a diff between two snapshots.

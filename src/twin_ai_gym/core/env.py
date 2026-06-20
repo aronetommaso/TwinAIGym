@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from twin_ai_gym.core.action import Action, ActionResult
+from twin_ai_gym.core.action import Action, ActionCommand, ActionResult, ActionSpec
+from twin_ai_gym.core.dynamics import DirectTransitionModel, TransitionModel
 from twin_ai_gym.core.episode import Episode
 from twin_ai_gym.core.evaluation import AgentPolicy, EvaluationResult, resolve_agent_action
 from twin_ai_gym.core.observation import FullObservation, Observation, ObservationPolicy
@@ -21,6 +22,7 @@ class TwinEnv:
         actions: Mapping[str, Action],
         reward: RewardAggregator | None = None,
         observation: ObservationPolicy | None = None,
+        transition_model: TransitionModel | None = None,
         max_steps: int = 100,
     ) -> None:
         """Initialize the environment.
@@ -37,6 +39,7 @@ class TwinEnv:
         self.actions = dict(actions)
         self.reward = reward or RewardAggregator()
         self.observation = observation or FullObservation()
+        self.transition_model = transition_model or DirectTransitionModel()
         self.max_steps = max_steps
         self._initial_snapshot = world.snapshot()
         self.episode = Episode(self._initial_snapshot)
@@ -56,12 +59,18 @@ class TwinEnv:
         self.world.rollback(self._initial_snapshot)
         if seed is not None:
             self.world.rng.seed(seed)
+            self.world.observation_rng.seed(seed + 1_000_003)
         self.episode = Episode(self.world.snapshot())
-        return self.observe(), {"step": self.world.step_count, "options": options or {}}
+        return self.observe(), {
+            "step": self.world.step_count,
+            "options": options or {},
+            "observability": self.observation.observability,
+            "transition_model": type(self.transition_model).__name__,
+        }
 
     def step(
         self,
-        action: str | Action | Mapping[str, str | Action],
+        action: str | Action | ActionCommand | Mapping[str, str | Action | ActionCommand],
     ) -> tuple[Observation, float, bool, bool, dict[str, Any]]:
         """Apply a single-agent or multi-agent action.
 
@@ -77,6 +86,12 @@ class TwinEnv:
         """Return the current observation."""
 
         return self.observation.observe(self.world, agent_id=agent_id)
+
+    @property
+    def action_space(self) -> dict[str, ActionSpec]:
+        """Return the explicit, machine-readable high-level action space."""
+
+        return {name: action.spec() for name, action in self.actions.items()}
 
     def render(self) -> str:
         """Render a compact textual view of the world."""
@@ -172,12 +187,12 @@ class TwinEnv:
 
     def _step_single(
         self,
-        action: str | Action,
+        action: str | Action | ActionCommand,
     ) -> tuple[Observation, float, bool, bool, dict[str, Any]]:
         """Apply one action and compute observation, reward, and info."""
 
-        action_obj = self._resolve_action(action)
-        result = action_obj.apply(self.world)
+        action_obj, command = self._resolve_action(action)
+        result = self.transition_model.transition(self.world, action_obj, command)
         before = result.snapshot_before
         if before is None:
             raise RuntimeError("Action did not produce a pre-action snapshot.")
@@ -191,6 +206,9 @@ class TwinEnv:
             "metadata": result.metadata,
             "diff": result.diff,
             "reward_components": reward.components,
+            "reward_attribution": reward.attribution,
+            "transition_model": type(self.transition_model).__name__,
+            "command": command,
         }
         self.episode.append(result.action_name, reward.total, terminated, truncated, info, result)
         return self.observe(), reward.total, terminated, truncated, info
@@ -216,13 +234,21 @@ class TwinEnv:
             "results": results,
         }
 
-    def _resolve_action(self, action: str | Action) -> Action:
+    def _resolve_action(
+        self,
+        action: str | Action | ActionCommand,
+    ) -> tuple[Action, ActionCommand]:
         """Resolve an action name or action instance."""
 
         if isinstance(action, Action):
-            return action
+            return action, ActionCommand(action.name)
+        if isinstance(action, ActionCommand):
+            try:
+                return self.actions[action.name], action
+            except KeyError as exc:
+                raise KeyError(f"Unknown action: {action.name}") from exc
         try:
-            return self.actions[action]
+            return self.actions[action], ActionCommand(action)
         except KeyError as exc:
             raise KeyError(f"Unknown action: {action}") from exc
 
